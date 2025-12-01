@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VoiceSheet Navigator</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <h1>VoiceSheet Navigator</h1>
+      <p class="subtitle">语音录入 WPS 成绩</p>
+    </header>
+
+    <section class="controls">
+      <button id="start-btn">开始监听</button>
+      <button id="stop-btn" class="secondary">停止</button>
+      <div id="status" class="status">等待开始</div>
+    </section>
+
+    <section class="config">
+      <label for="name-column">姓名所在列（数字，例如 B 列=2）：</label>
+      <input id="name-column" type="number" min="1" value="2" />
+      <label class="inline" for="debug-mode">
+        <input id="debug-mode" type="checkbox" /> 启用调试日志
+      </label>
+      <button id="save-config">保存设置</button>
+    </section>
+
+    <section class="help">
+      <p>在 WPS 表格中先点击目标学科列任意单元格，再说出 “学生名 + 分数”。</p>
+      <p class="muted">示例：张三 89 分</p>
+    </section>
+
+    <section class="manual-test">
+      <h2>手动调试</h2>
+      <label for="manual-name">学生姓名：</label>
+      <input id="manual-name" type="text" placeholder="如：李雷" />
+
+      <label for="manual-score">分数（数字或小数）：</label>
+      <input id="manual-score" type="number" inputmode="decimal" step="0.5" placeholder="如：95" />
+
+      <button id="send-manual">发送至当前列</button>
+      <p class="muted">用于无麦克风或调试阶段，先在表格中选中目标列后再提交。</p>
+    </section>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "VoiceSheet Navigator",
+  "version": "1.0.0",
+  "description": "Voice-controlled score entry for WPS spreadsheets.",
+  "permissions": ["storage", "activeTab"],
+  "host_permissions": ["https://*.wps.cn/*", "https://*.kdocs.cn/*"],
+  "background": {
+    "service_worker": "background/background.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.wps.cn/*", "https://*.kdocs.cn/*"],
+      "js": ["content/content-script.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

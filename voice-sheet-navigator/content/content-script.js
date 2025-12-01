@@ -14,6 +14,8 @@ function init() {
   });
 
   document.addEventListener("click", handleSelectionChange, { capture: true });
+  document.addEventListener("keyup", handleSelectionChange, { capture: true });
+  document.addEventListener("focusin", handleSelectionChange, { capture: true });
 
   chrome.runtime.onMessage.addListener((message) => {
     if (message?.type === MESSAGE_TYPES.VOICE_RESULT && message.payload) {
@@ -30,13 +32,8 @@ function init() {
 }
 
 function handleSelectionChange(event) {
-  const cell = event.target.closest("[data-row][data-col], [aria-rowindex][aria-colindex]");
-  if (!cell) return;
-  const colValue = cell.getAttribute("data-col") || cell.getAttribute("aria-colindex");
-  if (colValue) {
-    currentColumn = parseInt(colValue, 10);
-    logDebug("Current column set", currentColumn);
-  }
+  const cell = findCellFromEvent(event.target) || getSelectedCell();
+  updateCurrentColumn(cell);
 }
 
 function handleVoiceResult(payload) {
@@ -52,6 +49,10 @@ function handleVoiceResult(payload) {
   if (!row) {
     console.warn(`VoiceSheet Navigator: could not locate row for ${name}`);
     return;
+  }
+
+  if (!currentColumn) {
+    updateCurrentColumn(getSelectedCell());
   }
 
   if (!currentColumn) {
@@ -86,6 +87,7 @@ function getCellsInColumn(columnIndex) {
   const selectors = [
     `[data-col="${columnIndex}"]`,
     `[aria-colindex="${columnIndex}"]`,
+    `[role="gridcell"][aria-colindex="${columnIndex}"]`,
   ];
   return Array.from(document.querySelectorAll(selectors.join(",")));
 }
@@ -115,8 +117,29 @@ function getCell(rowIndex, colIndex) {
   const selectors = [
     `[data-row="${rowIndex}"][data-col="${colIndex}"]`,
     `[aria-rowindex="${rowIndex}"][aria-colindex="${colIndex}"]`,
+    `[role="gridcell"][aria-rowindex="${rowIndex}"][aria-colindex="${colIndex}"]`,
   ];
   return document.querySelector(selectors.join(","));
+}
+
+function findCellFromEvent(target) {
+  return target.closest(
+    "[data-row][data-col], [aria-rowindex][aria-colindex], [role='gridcell'][aria-rowindex][aria-colindex]",
+  );
+}
+
+function getSelectedCell() {
+  return document.querySelector(
+    "[aria-selected='true'][data-col][data-row], [aria-selected='true'][aria-rowindex][aria-colindex], [role='gridcell'][aria-selected='true']",
+  );
+}
+
+function updateCurrentColumn(cell) {
+  if (!cell) return;
+  const colValue = cell.getAttribute("data-col") || cell.getAttribute("aria-colindex");
+  if (!colValue) return;
+  currentColumn = parseInt(colValue, 10);
+  logDebug("Current column set", currentColumn);
 }
 
 function insertText(element, text) {
